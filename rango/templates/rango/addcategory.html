@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rango</title>
+    </head>
+
+    <body>
+        <br/>
+        <h1>Add new category</h1><br/>
+        {% if category_added %}
+            <p>Category added successfully</p>
+        {% endif %}
+        <form id="category_form" method="post" enctype="multipart/form-data" action="/rango/categories/add/">
+            {% csrf_token %}
+            Category title: <input type="text" name="category_title" value="" size="50"/>
+            <input type="submit" value="Add" name="add_category"/>
+        </form>
+    </body>
+</html>
