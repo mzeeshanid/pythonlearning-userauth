@@ -15,7 +15,7 @@ class UserProfile(models.Model):
 
 
 class Category(models.Model):
-    user = models.OneToOneField(User)
+    user = models.ForeignKey(User)
 
     category_title = models.CharField(max_length=35)
 

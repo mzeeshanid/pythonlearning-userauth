@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html>
-    <body>
-        {% if user.is_authenticated %}
-            <h1>Rango says... hello {{ user.username }}!</h1>
-            <a href="/rango/">Home</a> <br/>
-            <a href="/rango/categories/">Categories</a> <br/>
-            <a href="/rango/logout/">Logout</a> <br/>
-        {% else %}
-            <h1>Rango says... hello world!</h1>
-            <a href="/rango/register/">Register Here</a> <br/>
-            <a href="/rango/login/">Login</a>
-        {% endif %}
-    </body>
-</html>
+{% extends 'rango/base.html' %}
+{% block title %}Home{% endblock %}
+{% block body_block %}
+    {% if user.is_authenticated %}
+        <h1>Rango says... hello {{ user.username }}!</h1>
+    {% else %}
+        <h1>Rango says... hello guest!</h1>
+    {% endif %}
+{% endblock %}

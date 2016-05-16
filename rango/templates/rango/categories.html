@@ -1,9 +1,22 @@
-<html>
-    <head>Rango</head>
-    <body>
-        <br/>
-        <form action="/rango/categories/add/" method="get">
-            <input type="submit" value="Add category" name="submit" />
-        </form>
-    </body>
-</html>
+{% extends 'rango/base.html' %}
+{% block title %}Categories{% endblock %}
+
+{% block body_block %}
+    <table>
+            <tr>
+                <th>Category Id</th>
+                <th>Category Title</th>
+            </tr>
+            {% for category in categories %}
+                <tr>
+                    <td>{{category.id}}</td>
+                    <td>{{category.category_title}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% if user.is_authenticated %}
+            <form action="/rango/categories/add/" method="get">
+                <input type="submit" value="Add category" name="submit" />
+            </form>
+        {% endif %}
+{% endblock %}

@@ -1,18 +1,42 @@
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
+from datetime import datetime
 
-from rango.forms import UserForm, UserProfileForm, CategoryForm
+from rango.forms import UserForm, UserProfileForm, CategoryForm, Category
 
 
 def home(request):
+
     context = RequestContext(request)
 
-    return render_to_response('rango/index.html', context=context)
+    response = render_to_response('rango/index.html', context=context)
+
+    request.session.set_test_cookie()
+
+    visits = int(request.COOKIES.get('visit', 0))
+
+    if 'last_visit' in request.COOKIES:
+        last_visit = request.COOKIES['last_visit']
+        # Cast the value to a Python date/time object.
+        last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
+
+        # If it's been more than a day since the last visit...
+        if (datetime.now() - last_visit_time).days > 0:
+            response.set_cookie('visits', visits + 1)
+            response.set_cookie('last_visit', datetime.now())
+    else:
+        response.set_cookie('last_visit', datetime.now())
+
+    return response
 
 
 def register(request):
+    if request.session.test_cookie_worked():
+        print ">>>> TEST COOKIE WORKED!"
+        request.session.delete_test_cookie()
     context = RequestContext(request)
 
     registered = False
@@ -77,8 +101,16 @@ def user_logout(request):
 
 def categories(request):
     context = RequestContext(request)
-    return render_to_response('rango/categories.html', {}, context)
 
+    if request.user.is_authenticated():
+        categories = Category.objects.filter(user=request.user)
+    else:
+        categories = Category.objects.all()
+
+    return render_to_response('rango/categories.html', {'categories' : categories}, context)
+
+
+@login_required
 def add_category(request):
     context = RequestContext(request)
 
@@ -86,10 +118,11 @@ def add_category(request):
     if request.method == 'POST':
         category_form = CategoryForm(data=request.POST)
 
-        if category_form.is_valid:
-            category_form.user = request.user
+        if category_form.is_valid():
+            category = category_form.save(commit=False)
+            category.user = request.user
             print "this is userid: " + str(request.user)
-            category_form.save()
+            category.save()
 
             category_added = True
         else:
