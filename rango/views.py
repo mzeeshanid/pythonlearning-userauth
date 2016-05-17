@@ -12,25 +12,21 @@ def home(request):
 
     context = RequestContext(request)
 
-    response = render_to_response('rango/index.html', context=context)
+    if request.session.get('last_visit'):
+        last_visit_time = request.session.get('last_visit')
+        visits = request.session.get('visits', 0)
 
-    request.session.set_test_cookie()
+        if (datetime.now() - datetime.strptime(last_visit_time[:-7], "%Y-%m-%d %H:%M:%S")).seconds > 1:
+            request.session['visits'] = visits + 1
+            request.session['last_visit'] = str(datetime.now())
 
-    visits = int(request.COOKIES.get('visit', 0))
-
-    if 'last_visit' in request.COOKIES:
-        last_visit = request.COOKIES['last_visit']
-        # Cast the value to a Python date/time object.
-        last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
-
-        # If it's been more than a day since the last visit...
-        if (datetime.now() - last_visit_time).days > 0:
-            response.set_cookie('visits', visits + 1)
-            response.set_cookie('last_visit', datetime.now())
+        print "last visit exisits in session" + str(visits)
+        
     else:
-        response.set_cookie('last_visit', datetime.now())
+        request.session['last_visit'] = str(datetime.now())
+        request.session['visits'] = 1
 
-    return response
+    return render_to_response('rango/index.html', {}, context)
 
 
 def register(request):
