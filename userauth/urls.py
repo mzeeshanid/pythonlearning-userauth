@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from snippets.views import snippet_detail
+from snippets.views import snippet_list
 
 from rango import views
 
@@ -25,5 +27,7 @@ urlpatterns = [
     url(r'^rango/logout/$', views.user_logout, name='logout'),
     url(r'^rango/register/$', views.register, name='register'),
     url(r'^rango/categories/$', views.categories, name='categories'),
-    url(r'^rango/categories/add/$', views.add_category, name='addcategory')
+    url(r'^rango/categories/add/$', views.add_category, name='addcategory'),
+    url(r'^snippet/snippets/$', snippet_list),
+    url(r'^snippet/snippets/(?P<pk>[0-9]+)/$', snippet_detail),
 ]
